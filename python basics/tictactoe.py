@@ -1,4 +1,6 @@
-# write your code here
-print("O X O")
-print("X X O")
-print("X O X")
+players_input = input("Please, enter your values:")
+print("---------")
+print("| {} {} {} |".format(players_input[0], players_input[1], players_input[2]))
+print("| {} {} {} |".format(players_input[3], players_input[4], players_input[5]))
+print("| {} {} {} |".format(players_input[6], players_input[7], players_input[8]))
+print("---------")
