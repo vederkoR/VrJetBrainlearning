@@ -1,16 +1,42 @@
+import re
+
 result_not_finished = "Game not finished"
 result_draw = "Draw"
 result_x_win = "X wins"
 result_o_win = "O wins"
 result_impossible = "Impossible"
+max_field = 3
 
 players_input = input("Enter cells:")
 tmp = players_input
-print("---------")
-print("| {} {} {} |".format(players_input[0], players_input[1], players_input[2]))
-print("| {} {} {} |".format(players_input[3], players_input[4], players_input[5]))
-print("| {} {} {} |".format(players_input[6], players_input[7], players_input[8]))
-print("---------")
+
+
+def draw_board():
+    print("---------")
+    print("| {} {} {} |".format(tmp[0], tmp[1], tmp[2]))
+    print("| {} {} {} |".format(tmp[3], tmp[4], tmp[5]))
+    print("| {} {} {} |".format(tmp[6], tmp[7], tmp[8]))
+    print("---------")
+
+
+draw_board()
+while True:
+    new_pos = input("Enter the coordinates: ")
+    match = re.match(r'\d+\s\d+', new_pos)
+    if match is None:
+        print("You should enter numbers!")
+        continue
+    elif int(new_pos.split(" ")[0]) > max_field or int(new_pos.split(" ")[1]) > max_field:
+        print("Coordinates should be from 1 to 3!")
+        continue
+    elif tmp[(int(new_pos[0]) - 1) * 3 + (int(new_pos[2]) - 1)] != "_":
+        print("This cell is occupied! Choose another one!")
+        continue
+    else:
+        pos_ = (int(new_pos[0]) - 1) * 3 + (int(new_pos[2]) - 1)
+        tmp = tmp[:pos_] + 'X' + tmp[(pos_ + 1):]
+        draw_board()
+        break
 
 x_ = tmp[0] == tmp[1] == tmp[2] == "X" or tmp[3] == tmp[4] == tmp[5] == "X" or tmp[6] == tmp[7] == tmp[8] == "X" or tmp[
     0] == tmp[3] == tmp[6] == "X" or tmp[1] == tmp[4] == tmp[7] == "X" or tmp[2] == tmp[5] == tmp[8] == "X" or tmp[0] == \
