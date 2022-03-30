@@ -1,1 +1,6 @@
-print("H A N G M A N\nThe game will be available soon.")
+print("H A N G M A N")
+answer = input("Guess the word:")
+if answer == "python":
+    print("You survived!")
+else:
+    print("You lost!")
