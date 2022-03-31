@@ -10,12 +10,22 @@ word_ = "-" * (len(word))
 while num_of_attempts != 0:
     print(word_)
     answer = input("Input a letter:")
-    num_of_attempts -= 1
     if answer in word:
-        for i in range(len(word)):
-            if word[i] == answer:
-                word_ = word_[:i] + answer + word_[i + 1:]
+        if answer in word_:
+            print("No improvements.")
+            num_of_attempts -= 1
+        else:
+            for i in range(len(word)):
+                if word[i] == answer:
+                    word_ = word_[:i] + answer + word_[i + 1:]
     else:
+        num_of_attempts -= 1
         print("That letter doesn't appear in the word.")
     print()
-print("Thanks for playing!")
+    if "-" not in word_:
+        print(word)
+        print("You guessed the word!")
+        print("You survived!")
+        break
+    if num_of_attempts == 0:
+        print("You lost!")
