@@ -1,3 +1,4 @@
+import nltk
 from nltk.tokenize import WhitespaceTokenizer
 
 # Write your code here
@@ -5,16 +6,15 @@ filename = input()
 with open(filename, "r", encoding="utf-8") as file:
     text = file.read()
     tokens = WhitespaceTokenizer().tokenize(text)
-    print("Corpus statistics")
-    print("All tokens:", len(tokens))
-    print("Unique tokens:", len(set(tokens)))
+    bigrm = list(nltk.bigrams(tokens))
+    print("Number of bigrams:", len(bigrm))
     print()
     while True:
         token_num = input()
         if token_num == "exit":
             break
         try:
-            print(tokens[int(token_num)])
+            print(f"Head: {bigrm[int(token_num)][0]}    Tail: {bigrm[int(token_num)][1]}")
         except TypeError:
             print("Type Error. Please input an integer.")
         except IndexError:
