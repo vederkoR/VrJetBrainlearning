@@ -1,3 +1,4 @@
+import random
 import nltk
 from nltk.tokenize import WhitespaceTokenizer
 
@@ -12,25 +13,13 @@ with open(filename, "r", encoding="utf-8") as file:
         dict_words.setdefault(pair[0], {})
         dict_words[pair[0]].setdefault(pair[1], 0)
         dict_words[pair[0]][pair[1]] += 1
-    while True:
-        key_name = input()
-        if key_name == "exit":
-            break
-        print("Head:", key_name)
-        try:
-            for key, value in dict_words[key_name].items():
-                print(f"Tail: {key} Count: {value}")
-        except KeyError:
-            print("Key Error. The requested word is not in the model. Please input another word.")
-
-
-
-
-        # try:
-        #     print(f"Head: {bigrm[int(token_num)][0]}    Tail: {bigrm[int(token_num)][1]}")
-        # except TypeError:
-        #     print("Type Error. Please input an integer.")
-        # except IndexError:
-        #     print("Index Error. Please input an integer that is in the range of the corpus.")
-        # except ValueError:
-        #     print("Value Error. Please input an integer from 0 to corpus size")
+    for _ in range(0, 10):
+        word = random.choice(tokens)
+        phrase = ""
+        phrase += word
+        word_next = word
+        for i in range(0, 9):
+            word_next = \
+                random.choices(list(dict_words[word_next].keys()), weights=list(dict_words[word_next].values()), k=1)[0]
+            phrase += " " + word_next
+        print(phrase)
