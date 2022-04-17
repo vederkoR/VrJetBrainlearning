@@ -81,7 +81,8 @@ def place_pos(hor, ver, x_pos, y_pos, board_orig):
     opts = options_checker(hor, ver, x_pos, y_pos)
     for opt in opts:
         z_for_o = check_pos(hor, ver, opt[0], opt[1])
-        board_ret = board_update(board_ret, z_for_o, "O", ver)
+        num = len(options_checker(hor, ver, opt[0], opt[1])) - 1
+        board_ret = board_update(board_ret, z_for_o, str(num), ver)
     return board_ret
 
 
