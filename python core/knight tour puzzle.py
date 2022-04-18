@@ -5,10 +5,17 @@ v = 8
 h = 8
 board = ""
 board_size = input("Enter your board dimensions:")
+forbidden_positions = []
+available_moves = []
+current_position = (0, 0)
 while True:
     if re.fullmatch(r"\d\d? \d\d?", board_size):
         h, v = board_size.split(" ")
         h, v = int(h), int(v)
+        if h == 0 or v == 0:
+            print("Invalid dimensions!")
+            board_size = input("Enter your board dimensions:")
+            continue
         if v < 10:
             board = " " + "-" * ((3 * h + 1) + 2) + "\n"
             for i in range(0, v):
@@ -49,21 +56,21 @@ def check_pos(hor, ver, x_pos, y_pos):
 
 def options_checker(hor, ver, x_pos, y_pos):
     options = []
-    if x_pos + 2 <= hor and y_pos + 1 <= ver:
+    if x_pos + 2 <= hor and y_pos + 1 <= ver and (x_pos + 2, y_pos + 1) not in forbidden_positions:
         options.append((x_pos + 2, y_pos + 1))
-    if x_pos + 2 <= hor and y_pos - 1 > 0:
+    if x_pos + 2 <= hor and y_pos - 1 > 0 and (x_pos + 2, y_pos - 1) not in forbidden_positions:
         options.append((x_pos + 2, y_pos - 1))
-    if x_pos - 2 > 0 and y_pos + 1 <= ver:
+    if x_pos - 2 > 0 and y_pos + 1 <= ver and (x_pos - 2, y_pos + 1) not in forbidden_positions:
         options.append((x_pos - 2, y_pos + 1))
-    if x_pos - 2 > 0 and y_pos - 1 > 0:
+    if x_pos - 2 > 0 and y_pos - 1 > 0 and (x_pos - 2, y_pos - 1) not in forbidden_positions:
         options.append((x_pos - 2, y_pos - 1))
-    if x_pos + 1 <= hor and y_pos + 2 <= ver:
+    if x_pos + 1 <= hor and y_pos + 2 <= ver and (x_pos + 1, y_pos + 2) not in forbidden_positions:
         options.append((x_pos + 1, y_pos + 2))
-    if x_pos + 1 <= hor and y_pos - 2 > 0:
+    if x_pos + 1 <= hor and y_pos - 2 > 0 and (x_pos + 1, y_pos - 2) not in forbidden_positions:
         options.append((x_pos + 1, y_pos - 2))
-    if x_pos - 1 > 0 and y_pos + 2 <= ver:
+    if x_pos - 1 > 0 and y_pos + 2 <= ver and (x_pos - 1, y_pos + 2) not in forbidden_positions:
         options.append((x_pos - 1, y_pos + 2))
-    if x_pos - 1 > 0 and y_pos - 2 > 0:
+    if x_pos - 1 > 0 and y_pos - 2 > 0 and (x_pos - 1, y_pos - 2) not in forbidden_positions:
         options.append((x_pos - 1, y_pos - 2))
     return options
 
@@ -81,8 +88,15 @@ def place_pos(hor, ver, x_pos, y_pos, board_orig):
     opts = options_checker(hor, ver, x_pos, y_pos)
     for opt in opts:
         z_for_o = check_pos(hor, ver, opt[0], opt[1])
-        num = len(options_checker(hor, ver, opt[0], opt[1])) - 1
+        num = len(options_checker(hor, ver, opt[0], opt[1]))
         board_ret = board_update(board_ret, z_for_o, str(num), ver)
+    for pos in forbidden_positions:
+        z_for_star = check_pos(hor, ver, pos[0], pos[1])
+        board_ret = board_update(board_ret, z_for_star, '*', ver)
+    global available_moves
+    available_moves = opts
+    z_for_x = check_pos(hor, ver, x_pos, y_pos)
+    board_ret = board_update(board_ret, z_for_x, "X", ver)
     return board_ret
 
 
@@ -94,8 +108,35 @@ while True:
             print("Invalid position!")
             position = input("Enter the knight's starting position:")
             continue
+        forbidden_positions.append((x, y))
+        current_position = (x, y)
         print(place_pos(h, v, x, y, board))
         break
     else:
         print("Invalid position!")
         position = input("Enter the knight's starting position:")
+flag_1 = 'off'
+
+while True:
+    if h * v == len(forbidden_positions):
+        print("What a great tour! Congratulations!")
+        break
+    elif not available_moves:
+        print("No more possible moves!")
+        print("Your knight visited {} squares!".format(len(forbidden_positions)))
+        break
+    else:
+        if flag_1 == 'off':
+            next_position = input("Enter your next move:")
+        else:
+            next_position = input("Invalid move! Enter your next move:")
+        if re.fullmatch(r"\d\d? \d\d?", next_position):
+            x, y = next_position.split(" ")
+            x, y = int(x), int(y)
+            if (x > h or y > v or x == 0 or y == 0) or (x, y) not in available_moves:
+                flag_1 = 'on'
+                continue
+            else:
+                forbidden_positions.append((x, y))
+                current_position = (x, y)
+                print(place_pos(h, v, x, y, board))
