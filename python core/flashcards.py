@@ -1,5 +1,8 @@
 # Write your code here
-print("Card:")
-print("cos'(x)")
-print("Definition:")
-print("-sin(x)")
+term = input()
+question = input()
+answer = input()
+if question == answer:
+    print("Your answer is right!")
+else:
+    print("Your answer is wrong...")
