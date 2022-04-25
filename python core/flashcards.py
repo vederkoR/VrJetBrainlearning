@@ -1,3 +1,5 @@
+# Write your code here
+import argparse
 import random
 
 
@@ -93,11 +95,21 @@ def find_hardest_card(dictionary):
 
 my_cards = {}
 log = ""
+parser = argparse.ArgumentParser(description="This program helps to memorize words")
+parser.add_argument("--import_from")
+parser.add_argument("--export_to")
+args = parser.parse_args()
+if args.import_from:
+    num = import_card(args.import_from, my_cards)
+    print(add_to_log(f"{num} cards have been loaded."))
 while True:
     user_command = input(
         add_to_log('Input the action (add, remove, import, export, ask, exit, log, hardest card, reset stats):\n'))
     add_to_log(user_command)
     if user_command == "exit":
+        if args.export_to:
+            num = export_card(args.export_to, my_cards)
+            print(add_to_log(f"{num} cards have been saved."))
         print(add_to_log("Bye bye!"))
         break
     elif user_command == "add":
