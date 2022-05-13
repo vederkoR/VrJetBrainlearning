@@ -2,29 +2,28 @@ import requests
 
 from bs4 import BeautifulSoup
 
-print('Type "en" if you want to translate from French into English, or "fr" if you want to /'
-      'translate from English into French:')
-language_choice = input()
+print('Hello, welcome to the translator. Translator supports:')
+lang_pool = {"1": "Arabic", "2": "German", "3": "English", "4": "Spanish", "5": "French", "6": "Hebrew",
+             "7": "Japanese", "8": "Dutch", "9": "Polish", "10": "Portuguese", "11": "Romanian",
+             "12": "Russian", "13": "Turkish"}
+for k, v in lang_pool.items():
+    print(f"{k}. {v}")
+print("Type the number of your language:")
+language_from_choice = input()
+print("Type the number of language you want to translate to:")
+language_to_choice = input()
 print('Type the word you want to translate:')
 word = input()
-print(f'You chose "{language_choice}" as the language to translate "{word}".')
-translation_pair = ''
-language = ''
-if language_choice == "fr":
-    language = "French"
-    translation_pair = 'english-french'
-else:
-    language = "English"
-    translation_pair = 'french-english'
+translation_pair = f'{lang_pool[language_from_choice].lower()}-{lang_pool[language_to_choice].lower()}'
+
 url = 'https://context.reverso.net/translation/' + translation_pair + '/' + word
 headers = {'User-Agent': 'Mozilla/5.0'}
 r = requests.get(url, headers=headers)
 while str(r.status_code) != "200":
     r = requests.get(url, headers=headers)
 soup = BeautifulSoup(r.content, "html.parser")
-print("200 OK")
 print()
-print(language, "Translations:")
+print(lang_pool[language_to_choice], "Translations:")
 examples = []
 all_ = soup.find_all('div', class_="example")
 for one in all_:
@@ -40,7 +39,7 @@ for single_word in words:
     print(single_word)
 
 print()
-print(language, "Examples:")
+print(lang_pool[language_to_choice], "Examples:")
 j = 0
 for example in examples:
     if j > 0:
