@@ -1,3 +1,5 @@
+import sys
+
 import requests
 
 from bs4 import BeautifulSoup
@@ -7,25 +9,33 @@ class Translator:
     """This class represents a translator which is able to translate to 13 most popular languages \
      with multiple examples"""
 
-    lang_pool = {"1": "Arabic", "2": "German", "3": "English", "4": "Spanish", "5": "French", "6": "Hebrew",
+    lang_pool = {"0": "All", "1": "Arabic", "2": "German", "3": "English", "4": "Spanish", "5": "French", "6": "Hebrew",
                  "7": "Japanese", "8": "Dutch", "9": "Polish", "10": "Portuguese", "11": "Romanian",
                  "12": "Russian", "13": "Turkish"}
     url_base = 'https://context.reverso.net/translation/'
     headers = {'User-Agent': 'Mozilla/5.0'}
 
-    def __init__(self):
+    def __init__(self, in_from=None, in_to=None, arg_word=None):
         self.url = None
         self.index_to = None
         self.index_from = None
         self.to_translate = None
         self.translation_pair = None
         self.string_to_save = ''
+        self.in_from = in_from
+        self.in_to = in_to
+        self.arg_word = arg_word
 
     def run(self):
-        print('Hello, welcome to the translator. Translator supports:')
-        for k, v in Translator.lang_pool.items():
-            print(f"{k}. {v}")
-        self.params_set()
+        if self.in_from is None:
+            print('Hello, welcome to the translator. Translator supports:')
+            for k, v in Translator.lang_pool.items():
+                print(f"{k}. {v}")
+            self.params_set()
+        else:
+            self.index_from = str(list(Translator.lang_pool.values()).index(self.in_from.capitalize()))
+            self.index_to = str(list(Translator.lang_pool.values()).index(self.in_to.capitalize()))
+            self.to_translate = self.arg_word
         if self.index_to == "0":
             self.case_zero_action()
         else:
@@ -68,16 +78,22 @@ class Translator:
         for lang in Translator.lang_pool.values():
             if lang == Translator.lang_pool[self.index_from]:
                 continue
+            if lang == "All":
+                continue
             soup = self.soup_set(lang)
+            if lang != "Arabic":
+                self.print_s()
             self.print_s(Translator.lang_title_printer(lang))
             self.print_s(soup.find_all("span", class_="display-term")[0].text.strip())
             self.print_s()
             self.print_s(Translator.example_title_printer(lang))
             self.print_s(soup.find_all('div', class_="example")[0].text.strip().replace("\n\n\n\n\r\n          ", "\n")
                          .replace("\n\n\n\n\n", "\n"))
+            self.print_s()
 
     def case_not_zero_action(self):
         soup = self.soup_set(Translator.lang_pool[self.index_to])
+        self.print_s()
         self.print_s(Translator.lang_title_printer(Translator.lang_pool[self.index_to]))
 
         words = soup.find_all("span", class_="display-term")
@@ -101,5 +117,10 @@ class Translator:
         return Translator.connection(self.url, Translator.headers)
 
 
-translator = Translator()
+arguments = sys.argv
+if len(arguments) > 1:
+    translator = Translator(arguments[1], arguments[2], arguments[3])
+else:
+    translator = Translator()
 translator.run()
+
