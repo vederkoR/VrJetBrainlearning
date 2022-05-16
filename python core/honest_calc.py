@@ -9,6 +9,9 @@ class RudeCommenter:
     msg_7 = " ... very lazy"
     msg_8 = " ... very, very lazy"
     msg_9 = "You are"
+    msg_10 = "Are you sure? It is only one digit! (y / n)"
+    msg_11 = "Don't be silly! It's just one number! Add to the memory? (y / n)"
+    msg_12 = "Last chance! Do you really want to embarrass yourself? (y / n)"
 
     def __init__(self):
         self.equation = None
@@ -73,6 +76,21 @@ class RudeCommenter:
         print(RudeCommenter.msg_4)
         inner_choice = input()
         if inner_choice == "y":
+            if self.one_digit_checker(self.result):
+                print(RudeCommenter.msg_10)
+                inner_choice = input()
+                if inner_choice == "y":
+                    print(RudeCommenter.msg_11)
+                    inner_choice = input()
+                    if inner_choice == "y":
+                        print(RudeCommenter.msg_12)
+                        inner_choice = input()
+                        if inner_choice == "n":
+                            return
+                    else:
+                        return
+                else:
+                    return
             self.memory = self.result
 
     def cont_calc(self):
@@ -94,7 +112,7 @@ class RudeCommenter:
             self.msg = RudeCommenter.msg_9 + self.msg
 
     @staticmethod
-    def one_digit_checker(digit):
+    def one_digit_checker(digit: float) -> bool:
         return bool(digit.is_integer() and digit in range(-9, 10))
 
 
