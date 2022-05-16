@@ -5,6 +5,10 @@ class RudeCommenter:
     msg_3 = "Yeah... division by zero. Smart move..."
     msg_4 = "Do you want to store the result? (y / n):"
     msg_5 = "Do you want to continue calculations? (y / n):"
+    msg_6 = " ... lazy"
+    msg_7 = " ... very lazy"
+    msg_8 = " ... very, very lazy"
+    msg_9 = "You are"
 
     def __init__(self):
         self.equation = None
@@ -14,6 +18,7 @@ class RudeCommenter:
         self.memory = 0.0
         self.on = True
         self.result = None
+        self.msg = ''
 
     def run(self):
         while self.on:
@@ -22,8 +27,11 @@ class RudeCommenter:
     def process(self):
         while True:
             self.set_equation()
-            if not (self.first_var.replace(".", "", 1).replace("-", "", 1).isnumeric()
-                    and self.second_var.replace(".", "", 1).replace("-", "", 1).isnumeric()):
+            self.msg = ''
+            self.msg_adder()
+            if self.msg != 0:
+                print(self.msg)
+            if not self.correctness_check():
                 print(RudeCommenter.msg_1)
                 continue
             if self.sign not in r"+-*/":
@@ -37,6 +45,10 @@ class RudeCommenter:
             self.save()
             self.cont_calc()
             break
+
+    def correctness_check(self):
+        return (self.first_var.replace(".", "", 1).replace("-", "", 1).isnumeric() and
+                self.second_var.replace(".", "", 1).replace("-", "", 1).isnumeric())
 
     def set_equation(self):
         print(RudeCommenter.msg_0)
@@ -68,6 +80,22 @@ class RudeCommenter:
         inner_choice = input()
         if inner_choice != "y":
             self.on = False
+
+    def msg_adder(self):
+        if self.correctness_check():
+            if RudeCommenter.one_digit_checker(float(self.first_var)) and \
+                    RudeCommenter.one_digit_checker(float(self.second_var)):
+                self.msg += RudeCommenter.msg_6
+            if self.sign == '*' and (float(self.first_var) == 1 or float(self.second_var) == 1):
+                self.msg += RudeCommenter.msg_7
+            if (float(self.first_var) == 0 or float(self.second_var) == 0) and self.sign in r'*+-':
+                self.msg += RudeCommenter.msg_8
+        if self.msg != '':
+            self.msg = RudeCommenter.msg_9 + self.msg
+
+    @staticmethod
+    def one_digit_checker(digit):
+        return bool(digit.is_integer() and digit in range(-9, 10))
 
 
 def main():
