@@ -36,6 +36,7 @@ class Translator:
             self.index_from = str(list(Translator.lang_pool.values()).index(self.in_from.capitalize()))
             self.index_to = str(list(Translator.lang_pool.values()).index(self.in_to.capitalize()))
             self.to_translate = self.arg_word
+
         if self.index_to == "0":
             self.case_zero_action()
         else:
