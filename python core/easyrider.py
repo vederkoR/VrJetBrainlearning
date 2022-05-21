@@ -1,26 +1,25 @@
 import json
-import time
-
-
-def time_converter(date_string):
-    converted_time = time.strptime(date_string, "%H:%M")
-    return converted_time
-
 
 bus_data = json.loads(input())
-error_list = []
-lines_checked = []
-for i, bus in enumerate(bus_data):
-    if i == 0 or bus["bus_id"] != bus_data[i - 1]["bus_id"] or bus["bus_id"] in lines_checked:
-        continue
-    if time_converter(bus["a_time"]) < time_converter(bus_data[i - 1]["a_time"]):
-        error_list.append((bus["bus_id"], bus["stop_name"]))
-        lines_checked.append(bus["bus_id"])
+all_stations = dict()
+not_allowed = []
+on_demand = []
+for bus in bus_data:
+    all_stations.setdefault(bus["stop_name"], 0)
+    all_stations[bus["stop_name"]] += 1
+    if bus["stop_type"] == "O":
+        on_demand.append(bus["stop_name"])
+    elif bus["stop_type"] == "S" or bus["stop_type"] == "F":
+        not_allowed.append(bus["stop_name"])
+for k, v in all_stations.items():
+    if v > 1:
+        not_allowed.append(k)
+not_allowed = set(not_allowed)
+on_demand = set(on_demand)
+final_list = sorted(list(on_demand.intersection(not_allowed)))
 
-print("Arrival time test:")
-if not error_list:
+print("On demand stops test:")
+if not final_list:
     print("OK")
 else:
-    for item in error_list:
-        print(f"bus_id line {item[0]}: wrong time on station {item[1]}")
-
+    print("Wrong stop type:", final_list)
