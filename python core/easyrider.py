@@ -1,36 +1,26 @@
 import json
+import time
 
-dict_buses = {}
-stops = {}
-starts = set()
-finishes = set()
-for bus in json.loads(input()):
-    dict_buses.setdefault(bus["bus_id"], [False, False])
-    if bus["stop_type"] == "S":
-        dict_buses[bus["bus_id"]][0] = True
-        starts.add(bus["stop_name"])
-    elif bus["stop_type"] == "F":
-        dict_buses[bus["bus_id"]][1] = True
-        finishes.add(bus["stop_name"])
-    stops.setdefault(bus["stop_name"], 0)
-    stops[bus["stop_name"]] += 1
-error_line = None
-for k, v in dict_buses.items():
-    if not (v[0] and v[1]):
-        error_line = k
+
+def time_converter(date_string):
+    converted_time = time.strptime(date_string, "%H:%M")
+    return converted_time
+
+
+bus_data = json.loads(input())
+error_list = []
+lines_checked = []
+for i, bus in enumerate(bus_data):
+    if i == 0 or bus["bus_id"] != bus_data[i - 1]["bus_id"] or bus["bus_id"] in lines_checked:
         continue
+    if time_converter(bus["a_time"]) < time_converter(bus_data[i - 1]["a_time"]):
+        error_list.append((bus["bus_id"], bus["stop_name"]))
+        lines_checked.append(bus["bus_id"])
 
-if error_line:
-    print(f"There is no start or end stop for the line: {error_line}.")
+print("Arrival time test:")
+if not error_list:
+    print("OK")
 else:
-    transfer_list = []
-    for k, v in stops.items():
-        if v > 1:
-            transfer_list.append(k)
-    finish_list = sorted(list(finishes))
-    start_list = sorted(list(starts))
-    transfer_list.sort()
-    print(f"Start stops: {len(start_list)}", start_list)
-    print(f"Transfer stops: {len(transfer_list)}", transfer_list)
-    print(f"Finish stops: {len(finish_list)}", finish_list)
+    for item in error_list:
+        print(f"bus_id line {item[0]}: wrong time on station {item[1]}")
 
