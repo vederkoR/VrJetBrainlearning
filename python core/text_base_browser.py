@@ -1,3 +1,6 @@
+import os
+import sys
+
 nytimes_com = '''
 This New Liquid Is Magnetic, and Mesmerizing
 
@@ -33,12 +36,32 @@ Twitter and Square Chief Executive Officer Jack Dorsey
  Tuesday, a signal of the strong ties between the Silicon Valley giants.
 '''
 
+args = sys.argv
+dir_ = args[1]
+try:
+    os.mkdir(dir_)
+except FileExistsError:
+    pass
 # write your code here
 while True:
     command = input()
-    if command == "bloomberg.com":
-        print(bloomberg_com)
-    if command == "nytimes.com":
-        print(nytimes_com)
-    if command == "exit":
+    if command.split(".")[0] == "bloomberg":
+        if os.access(f'{dir_}/bloomberg', os.F_OK):
+            with open(f'{dir_}/bloomberg', mode='r', encoding='utf-8') as file:
+                print(file.read())
+        else:
+            with open(f'{dir_}/bloomberg', mode='w', encoding='utf-8') as file:
+                file.write(bloomberg_com)
+            print(bloomberg_com)
+    elif command.split(".")[0] == "nytimes":
+        if os.access(f'{dir_}/nytimes', os.F_OK):
+            with open(f'{dir_}/nytimes', mode='r', encoding='utf-8') as file:
+                print(file.read())
+        else:
+            with open(f'{dir_}/nytimes', mode='w', encoding='utf-8') as file:
+                file.write(nytimes_com)
+            print(nytimes_com)
+    elif command == "exit":
         break
+    else:
+        print("Error: Incorrect URL")
