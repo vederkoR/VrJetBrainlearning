@@ -54,6 +54,8 @@ if __name__ == "__main__":
         flag = False
         command = input("Choose a formatter: ")
         if command == "!done":
+            with open("output.md", mode="w", encoding="utf-8") as file:
+                file.write(editor.full_text)
             break
         elif command == "!help":
             MarkdownEditor.list_commands()
@@ -112,3 +114,4 @@ if __name__ == "__main__":
         else:
             print("Unknown formatting type or command")
         print(editor.full_text)
+
