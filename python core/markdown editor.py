@@ -36,6 +36,17 @@ class MarkdownEditor:
     def link(url_, string):
         return f"[{string}]({url_})"
 
+    @staticmethod
+    def list_creator(type_, rows):
+        to_return = ''
+        for i, n in enumerate(rows):
+            if type_ == 'o':
+                sym = f"{i + 1}."
+            else:
+                sym = "*"
+            to_return += f"{sym} {n}\n"
+        return to_return
+
 
 if __name__ == "__main__":
     editor = MarkdownEditor()
@@ -76,6 +87,28 @@ if __name__ == "__main__":
             editor.update(MarkdownEditor.link(url, label))
         elif command == "new-line":
             editor.update("\n")
+        elif command == "unordered-list":
+            while True:
+                number = int(input("Number of rows:"))
+                if number > 0:
+                    break
+                else:
+                    print("The number of rows should be greater than zero")
+            rows_list = []
+            for num in range(number):
+                rows_list.append(input(f"Row #{num}:"))
+            editor.update(MarkdownEditor.list_creator("u", rows_list))
+        elif command == "ordered-list":
+            while True:
+                number = int(input("Number of rows:"))
+                if number > 0:
+                    break
+                else:
+                    print("The number of rows should be greater than zero")
+            rows_list = []
+            for num in range(number):
+                rows_list.append(input(f"Row #{num}:"))
+            editor.update(MarkdownEditor.list_creator("o", rows_list))
         else:
             print("Unknown formatting type or command")
         print(editor.full_text)
