@@ -29,3 +29,17 @@ element4.addEventListener("click", function () {
     areaText.value = arr_upper.join(". ");
 })
 
+let element5 = document.getElementById("save-text-file");
+element5.addEventListener("click", function () {
+    let a = document.createElement("a");
+    a.href = window.URL.createObjectURL(new Blob([areaText.value], {type: "text/plain;charset=utf-8"}));
+    a.download = "text.txt";
+    a.click();
+})
+
+
+
+// var a = document.getElementById("a");
+// var file = new Blob([text], {type: type});
+// a.href = URL.createObjectURL(file);
+// a.download = name;
