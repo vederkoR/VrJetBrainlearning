@@ -6,26 +6,47 @@ body {
 
 .piano_btn{
     background-color: white;
-}
-
-kbd {
     display: inline-block;
     width: 50px;
     height: 250px;
     border: solid 2px lightsteelblue;
     margin: 0 0 0 0;
     text-align: center;
-    line-height: 200px;
+    line-height: 350px;
 }
 
-.container {
-    border: black;
-    border: dot-dash;
+.piano_btn_bl{
     background-color: black;
+    display: inline-block;
+    width: 30px;
+    height: 130px;
+    border: solid 2px lightsteelblue;
+    margin: 0 10px 0 10px;
+    text-align: center;
+    line-height: 200px;
+    color: white;
+}
+
+
+.white-keys {
     position: absolute;
     left: 30vw;
     top: 30vh;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.black-keys {
+    position: absolute;
+    left: 30vw;
+    top: 30vh;
+    display: flex;
+}
+
+#kW {
+    margin: 0 11px 0 36px;
+}
+#kE {
+    margin: 0 64px 0 10px;
 }
