@@ -1,5 +1,7 @@
 body {
     background-color: gray;
+    display: flex;
+    justify-content: center;
 }
 
 .piano_btn{
@@ -17,8 +19,13 @@ kbd {
 }
 
 .container {
+    border: black;
+    border: dot-dash;
+    background-color: black;
     position: absolute;
-    left: 50vw;
-    top: 50vh;
+    left: 30vw;
+    top: 30vh;
     display: flex;
+    align-items: center;
+    justify-content: center;
 }
