@@ -121,3 +121,82 @@ h2, p {
     opacity: 1;
     pointer-events: all;
 }
+
+#menu a, #hamburger-menu a {
+    color: cornflowerblue;
+}
+
+#menu a:hover, #hamburger-menu a:hover, #close-menu-hamburger:hover, header h1:hover {
+    color: blueviolet;
+}
+
+#menu {
+    width: 470px;
+    height: 150px;
+    position: fixed;
+    display: flex;
+    justify-content: space-between;
+}
+
+
+/* Hamburger menu */
+#menu-hamburger {
+    height: 500px;
+    width: 130px;
+    background-color: gray;
+    position: fixed;
+    display: none;
+    flex-direction: column;
+    top: 200px;
+    left: 0;
+    justify-content: space-around;
+    text-align: center;
+    padding: 20px 20px 0;
+    font-size: 17px;
+    border-radius: 15px;
+    box-shadow: 5px 5px 15px black, 0 0 20px white, 0 0 10px midnightblue inset,
+    5px 5px 15px black, 0 0 20px white;
+    cursor: pointer;
+}
+
+
+@media (min-width: 1100px) {
+    .hamburger, #menu-hamburger {
+        display: none;
+    }
+
+    #open-menu-hamburger {
+        display: block;
+    }
+}
+
+@media (max-width: 1099px) {
+    #open-menu-hamburger {
+        display: block;
+    }
+
+    #portfolio {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        font-size: 40px;
+        background-color: dodgerblue;
+    }
+
+    #menu {
+        display: none;
+    }
+}
+
+#close-menu-hamburger {
+    font-family: 'Langar', cursive;
+}
+
+#open-menu-hamburger {
+    height: 30px;
+    width: 30px;
+}
