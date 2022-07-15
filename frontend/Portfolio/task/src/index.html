@@ -32,6 +32,18 @@
     <h2>Portfolio</h2>
     <img src="knight%20puzzle.jpg" alt="Knight puzzle pic">
     <p>Knight puzzle</p>
+        <button class="open-window" data-modal-target="#modal">More about this project</button>
+        <div class="modal" id="modal">
+            <div class="window">
+                <div class="title">Example Modal</div>
+                <button data-close-button class="close-button">&times;</button>
+            </div>
+            <div class="modal-body">
+                Visit the following link to see more about Knight puzzle.<br>
+                It is one of the examples of backtracking problems I was working on during my education.
+            </div>
+        </div>
+        <div id="overlay"></div>
     <img src="password_hacker.png" alt="Password hacker pic" width="360" height="240">
     <p>Password hacker</p>
     </section>
@@ -47,5 +59,6 @@
         Viktor Reshetnikov 2022
     </footer>
 </main>
+<script defer src="script.js"></script>
 </body>
 </html>
