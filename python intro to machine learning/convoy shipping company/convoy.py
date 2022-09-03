@@ -1,4 +1,6 @@
+# Write your code here
 import pandas as pd
+import sqlite3
 
 
 class Converter:
@@ -29,6 +31,36 @@ class Converter:
         vehicle_series.to_csv(f"{self.file_name}[CHECKED].csv", index=False, header=True)
         print(f"{corrected_cells} cells were corrected in {self.file_name}[CHECKED].csv")
 
+    def to_sql(self):
+        vehicle_series = pd.read_csv(f"{self.file_name}[CHECKED].csv")
+        conn = sqlite3.connect(f"{self.file_name}.s3db")
+        cursor = conn.cursor()
+        number_of_records = 0
+        cursor.execute('''
+        		CREATE TABLE IF NOT EXISTS convoy (
+        			vehicle_id integer PRIMARY KEY,
+        			engine_capacity integer NOT NULL,
+        			fuel_consumption integer NOT NULL,
+        			maximum_load integer NOT NULL
+        			);
+                       ''')
+        for row in vehicle_series.itertuples():
+            number_of_records += 1
+            cursor.execute('''
+                        INSERT INTO convoy (vehicle_id, engine_capacity, fuel_consumption, maximum_load)
+                        VALUES (?,?,?,?)
+                        ''',
+                           (row.vehicle_id,
+                            row.engine_capacity,
+                            row.fuel_consumption,
+                            row.maximum_load)
+                           )
+        conn.commit()
+        if number_of_records == 1:
+            print(f"1 record was inserted into {self.file_name}.s3db")
+        else:
+            print(f"{number_of_records} records were inserted into {self.file_name}.s3db")
+
 
 if __name__ == "__main__":
     print("Input file name")
@@ -38,9 +70,15 @@ if __name__ == "__main__":
             name = name[0: -5]
             converter = Converter(name)
             converter.save_csv()
+            converter.correct()
             break
-        if name.endswith(".csv"):
-            name = name[0: -4]
+        elif name.endswith("[CHECKED].csv"):
+            name = name[0: -13]
             converter = Converter(name)
             break
-    converter.correct()
+        elif name.endswith(".csv"):
+            name = name[0: -4]
+            converter = Converter(name)
+            converter.correct()
+            break
+    converter.to_sql()
