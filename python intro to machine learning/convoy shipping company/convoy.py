@@ -2,6 +2,7 @@
 import pandas as pd
 import sqlite3
 import json
+from dicttoxml import dicttoxml
 
 
 class Converter:
@@ -83,6 +84,21 @@ class Converter:
             print(f"1 vehicle was saved into {self.file_name}.json")
         else:
             print(f"{num_of_vehicles} vehicles were saved into {self.file_name}.json")
+
+        xml_total = ""
+        for vehicle in vehicles:
+            xml = dicttoxml(vehicle, attr_type=False, root='vehicle')
+            xml_formatted_1 = " <vehicle> " + str(xml)[2:-1] + " </vehicle> "
+            xml_total += xml_formatted_1
+        xml_final = "<convoy> " + xml_total + " </convoy>"
+
+
+        with open(f"{self.file_name}.xml", "w") as xml_file:
+            xml_file.write(xml_final)
+        if num_of_vehicles == 1:
+            print(f"1 vehicle was saved into {self.file_name}.xml")
+        else:
+            print(f"{num_of_vehicles} vehicles were saved into {self.file_name}.xml")
 
 
 if __name__ == "__main__":
