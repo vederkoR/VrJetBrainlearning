@@ -1,6 +1,7 @@
 # Write your code here
 import pandas as pd
 import sqlite3
+import json
 
 
 class Converter:
@@ -56,10 +57,32 @@ class Converter:
                             row.maximum_load)
                            )
         conn.commit()
+        conn.close()
         if number_of_records == 1:
             print(f"1 record was inserted into {self.file_name}.s3db")
         else:
             print(f"{number_of_records} records were inserted into {self.file_name}.s3db")
+
+    def to_json(self):
+        conn = sqlite3.connect(f"{self.file_name}.s3db")
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        rows = cursor.execute('''
+                        SELECT * from convoy
+                        ''').fetchall()
+        conn.commit()
+        conn.close()
+        vehicles = []
+        for row in rows:
+            vehicles.append(dict(row))
+        num_of_vehicles = len(vehicles)
+        json_data_formatted = {"convoy": vehicles}
+        with open(f"{self.file_name}.json", "w") as json_file:
+            json.dump(json_data_formatted, json_file)
+        if num_of_vehicles == 1:
+            print(f"1 vehicle was saved into {self.file_name}.json")
+        else:
+            print(f"{num_of_vehicles} vehicles were saved into {self.file_name}.json")
 
 
 if __name__ == "__main__":
@@ -71,14 +94,21 @@ if __name__ == "__main__":
             converter = Converter(name)
             converter.save_csv()
             converter.correct()
+            converter.to_sql()
             break
         elif name.endswith("[CHECKED].csv"):
             name = name[0: -13]
             converter = Converter(name)
+            converter.to_sql()
             break
         elif name.endswith(".csv"):
             name = name[0: -4]
             converter = Converter(name)
             converter.correct()
+            converter.to_sql()
             break
-    converter.to_sql()
+        elif name.endswith(".s3db"):
+            name = name[0: -5]
+            converter = Converter(name)
+            break
+    converter.to_json()
