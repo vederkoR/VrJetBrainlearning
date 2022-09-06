@@ -25,7 +25,7 @@ class Converter:
         corrected_cells = 0
         for i in range(number_of_lines):
             for j in range(number_of_rows):
-                if vehicle_series.iat[i, j].isnumeric():
+                if str(vehicle_series.iat[i, j]).isnumeric():
                     continue
                 else:
                     corrected_cells += 1
@@ -43,19 +43,22 @@ class Converter:
         			vehicle_id integer PRIMARY KEY,
         			engine_capacity integer NOT NULL,
         			fuel_consumption integer NOT NULL,
-        			maximum_load integer NOT NULL
+        			maximum_load integer NOT NULL,
+        			score integer NOT NULL
         			);
                        ''')
         for row in vehicle_series.itertuples():
             number_of_records += 1
+            points = Converter.point_calculator(row)
             cursor.execute('''
-                        INSERT INTO convoy (vehicle_id, engine_capacity, fuel_consumption, maximum_load)
-                        VALUES (?,?,?,?)
+                        INSERT INTO convoy (vehicle_id, engine_capacity, fuel_consumption, maximum_load, score)
+                        VALUES (?,?,?,?,?)
                         ''',
                            (row.vehicle_id,
                             row.engine_capacity,
                             row.fuel_consumption,
-                            row.maximum_load)
+                            row.maximum_load,
+                            points)
                            )
         conn.commit()
         conn.close()
@@ -63,6 +66,26 @@ class Converter:
             print(f"1 record was inserted into {self.file_name}.s3db")
         else:
             print(f"{number_of_records} records were inserted into {self.file_name}.s3db")
+
+    @staticmethod
+    def point_calculator(row):
+        points = 0
+        fuel_consumed = 4.5 * row.fuel_consumption
+        pip_stops = fuel_consumed / row.engine_capacity
+        if pip_stops <= 1:
+            points += 2
+        elif pip_stops <= 2:
+            points += 1
+
+        if fuel_consumed <= 230:
+            points += 2
+        else:
+            points += 1
+
+        if row.maximum_load >= 20:
+            points += 2
+
+        return points
 
     def to_json(self):
         conn = sqlite3.connect(f"{self.file_name}.s3db")
@@ -73,32 +96,39 @@ class Converter:
                         ''').fetchall()
         conn.commit()
         conn.close()
-        vehicles = []
+        vehicles_to_json = []
+        vehicles_to_xml = []
         for row in rows:
-            vehicles.append(dict(row))
-        num_of_vehicles = len(vehicles)
-        json_data_formatted = {"convoy": vehicles}
+            temp_row = dict(row)
+            if temp_row["score"] > 3:
+                del temp_row["score"]
+                vehicles_to_json.append(temp_row)
+            else:
+                del temp_row["score"]
+                vehicles_to_xml.append(temp_row)
+        num_of_vehicles_json = len(vehicles_to_json)
+        json_data_formatted = {"convoy": vehicles_to_json}
         with open(f"{self.file_name}.json", "w") as json_file:
             json.dump(json_data_formatted, json_file)
-        if num_of_vehicles == 1:
+        if num_of_vehicles_json == 1:
             print(f"1 vehicle was saved into {self.file_name}.json")
         else:
-            print(f"{num_of_vehicles} vehicles were saved into {self.file_name}.json")
+            print(f"{num_of_vehicles_json} vehicles were saved into {self.file_name}.json")
 
         xml_total = ""
-        for vehicle in vehicles:
+        for vehicle in vehicles_to_xml:
             xml = dicttoxml(vehicle, attr_type=False, root='vehicle')
             xml_formatted_1 = " <vehicle> " + str(xml)[2:-1] + " </vehicle> "
             xml_total += xml_formatted_1
         xml_final = "<convoy> " + xml_total + " </convoy>"
-
+        num_of_vehicles_xml = len(vehicles_to_xml)
 
         with open(f"{self.file_name}.xml", "w") as xml_file:
             xml_file.write(xml_final)
-        if num_of_vehicles == 1:
+        if num_of_vehicles_xml == 1:
             print(f"1 vehicle was saved into {self.file_name}.xml")
         else:
-            print(f"{num_of_vehicles} vehicles were saved into {self.file_name}.xml")
+            print(f"{num_of_vehicles_xml} vehicles were saved into {self.file_name}.xml")
 
 
 if __name__ == "__main__":
