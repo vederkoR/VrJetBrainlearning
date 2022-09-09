@@ -1,13 +1,14 @@
 import requests
+from bs4 import BeautifulSoup
 
-print('Input the URL:')
-url = input()
+url = input('Input the URL:')
 r = requests.get(url)
-if r.status_code == 200:
-    jsoned = r.json()
-    try:
-        print(jsoned["content"])
-    except KeyError:
-        print("Invalid quote resource!")
+
+if r:
+    content = r.content
+    with open('source.html', 'wb') as file:
+        file.write(content)
+        print("Content saved.")
+
 else:
-    print("Invalid quote resource!")
+    print(f'The URL returned {r.status_code}')
