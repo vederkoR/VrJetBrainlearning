@@ -48,5 +48,9 @@ if __name__ == '__main__':
     final_df.dropna(inplace=True)
     final_df = final_df.sort_index()
 
-    print(list(final_df.index))
-    print(list(final_df.columns))
+    print(list(final_df.sort_values('average_monthly_hours', ascending=False).head(10).Department))
+    print(sum(final_df.query("salary == 'low' & Department == 'IT'").number_project))
+    scores = []
+    for employee in ["A4", "B7064", "A3033"]:
+        scores.append([final_df.loc[employee, "last_evaluation"], final_df.loc[employee, "satisfaction_level"]])
+    print(scores)
