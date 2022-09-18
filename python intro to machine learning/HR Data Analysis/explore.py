@@ -51,21 +51,22 @@ if __name__ == '__main__':
     final_df = final_df.drop(columns=['employee_office_id'])
     final_df.dropna(inplace=True)
     final_df = final_df.sort_index()
-    final_df.left = final_df.left.astype(int)
-    final_dict = dict()
-    final_dict[('number_project', 'median')] = \
-        final_df.groupby('left').agg({'number_project': 'median'}).to_dict()['number_project']
-    final_dict[('number_project', 'count_bigger_5')] = \
-        final_df[final_df.number_project > 5].groupby('left').agg({'number_project': 'count'}).to_dict()[
-            'number_project']
-    final_dict[('time_spend_company', 'mean')] = \
-        final_df.groupby('left').agg({'time_spend_company': 'mean'}).apply(round_2).to_dict()['time_spend_company']
-    final_dict[('time_spend_company', 'median')] = \
-        final_df.groupby('left').agg({'time_spend_company': 'median'}).apply(round_2).to_dict()['time_spend_company']
-    final_dict[('Work_accident', 'mean')] = \
-        final_df.groupby('left').agg({'Work_accident': 'mean'}).apply(round_2).to_dict()['Work_accident']
-    final_dict[('last_evaluation', 'mean')] = \
-        final_df.groupby('left').agg({'last_evaluation': 'mean'}).apply(round_2).to_dict()['last_evaluation']
-    final_dict[('last_evaluation', 'std')] = \
-        final_df.groupby('left').agg({'last_evaluation': 'std'}).apply(round_2).to_dict()['last_evaluation']
-    print(final_dict)
+    first_table_not_selected = final_df.pivot_table(index='Department',
+                                                    columns=['left', 'salary'],
+                                                    values='average_monthly_hours',
+                                                    aggfunc='median').round(2)
+    first_table = first_table_not_selected[
+        (first_table_not_selected[0.0]['high'] < first_table_not_selected[0.0]['medium']) | (
+                first_table_not_selected[1.0]['low'] < first_table_not_selected[1.0]['high'])]
+
+    second_table_not_selected = final_df.pivot_table(index='time_spend_company',
+                                                     columns='promotion_last_5years',
+                                                     values=['satisfaction_level', 'last_evaluation'],
+                                                     aggfunc=['min', 'max', 'mean']).round(2)
+
+    second_table = second_table_not_selected[
+        second_table_not_selected['mean']['last_evaluation'][0] > second_table_not_selected['mean']['last_evaluation'][
+            1]]
+
+    print(first_table.to_dict())
+    print(second_table.to_dict())
