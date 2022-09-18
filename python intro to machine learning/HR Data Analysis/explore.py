@@ -34,6 +34,10 @@ def re_indexer(pd_df, series):
     pd_df.index = re_indexed_list
 
 
+def round_2(x):
+    return round(x, 2)
+
+
 if __name__ == '__main__':
     files_formation()
     pd_a = pd.read_xml("../Data/A_office_data.xml")
@@ -47,10 +51,21 @@ if __name__ == '__main__':
     final_df = final_df.drop(columns=['employee_office_id'])
     final_df.dropna(inplace=True)
     final_df = final_df.sort_index()
-
-    print(list(final_df.sort_values('average_monthly_hours', ascending=False).head(10).Department))
-    print(sum(final_df.query("salary == 'low' & Department == 'IT'").number_project))
-    scores = []
-    for employee in ["A4", "B7064", "A3033"]:
-        scores.append([final_df.loc[employee, "last_evaluation"], final_df.loc[employee, "satisfaction_level"]])
-    print(scores)
+    final_df.left = final_df.left.astype(int)
+    final_dict = dict()
+    final_dict[('number_project', 'median')] = \
+        final_df.groupby('left').agg({'number_project': 'median'}).to_dict()['number_project']
+    final_dict[('number_project', 'count_bigger_5')] = \
+        final_df[final_df.number_project > 5].groupby('left').agg({'number_project': 'count'}).to_dict()[
+            'number_project']
+    final_dict[('time_spend_company', 'mean')] = \
+        final_df.groupby('left').agg({'time_spend_company': 'mean'}).apply(round_2).to_dict()['time_spend_company']
+    final_dict[('time_spend_company', 'median')] = \
+        final_df.groupby('left').agg({'time_spend_company': 'median'}).apply(round_2).to_dict()['time_spend_company']
+    final_dict[('Work_accident', 'mean')] = \
+        final_df.groupby('left').agg({'Work_accident': 'mean'}).apply(round_2).to_dict()['Work_accident']
+    final_dict[('last_evaluation', 'mean')] = \
+        final_df.groupby('left').agg({'last_evaluation': 'mean'}).apply(round_2).to_dict()['last_evaluation']
+    final_dict[('last_evaluation', 'std')] = \
+        final_df.groupby('left').agg({'last_evaluation': 'std'}).apply(round_2).to_dict()['last_evaluation']
+    print(final_dict)
