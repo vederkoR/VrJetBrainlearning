@@ -1,4 +1,6 @@
 import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
 
 
 class CustomLinearRegression:
@@ -39,15 +41,23 @@ class CustomLinearRegression:
 
 
 d = CustomLinearRegression(fit_intercept=False)
-x = [[1, 0.9, 11], [1, 0.5, 11], [1, 1.75, 9], [1, 2, 8], [1, 1.4, 7], [1, 1.5, 7], [1, 3, 6], [1, 1.1, 5],
-     [1, 2.6, 5], [1, 1.9, 4]]
-d.fit(X=np.matrix(x),
-      y=np.array([21.95, 27.18, 16.9, 15.37, 16.03, 18.15, 14.22, 18.72, 15.4, 14.69]))
-d.predict(X=np.matrix(x))
+x_mx = [[1, 2.31, 65.2, 15.3], [1, 7.07, 78.9, 17.8], [1, 7.07, 61.1, 17.8], [1, 2.18, 45.8, 18.7],
+        [1, 2.18, 54.2, 18.7], [1, 2.18, 58.7, 18.7], [1, 7.87, 96.1, 15.2], [1, 7.87, 100.0, 15.2],
+        [1, 7.87, 85.9, 15.2], [1, 7.87, 94.3, 15.2]]
+y_ar = [24, 21.6, 34.7, 33.4, 36.2, 28.7, 27.1, 16.5, 18.9, 15.0]
+d.fit(X=np.matrix(x_mx),
+      y=np.array(y_ar))
+d.predict(X=np.matrix(x_mx))
 
+v = LinearRegression(fit_intercept=True)
+v.fit(X=np.matrix(x_mx), y=y_ar)
 
-print({'Intercept': d.coefficients[0],
-       'Coefficient': np.array(d.coefficients[1:]),
-       'R2': d.r2_score(),
-       'RMSE': d.rmse()}
+prediction_for_v = v.predict(x_mx)
+rmse_v = mean_squared_error(y_ar, prediction_for_v) ** 0.5
+r2_for_v = r2_score(prediction_for_v, y_ar)
+
+print({'Intercept': abs(d.coefficients[0] - v.intercept_),
+       'Coefficient': (v.coef_[1:] - d.coefficients[1:]),
+       'R2': abs(d.r2_score() - r2_for_v),
+       'RMSE': abs(d.rmse() - rmse_v)}
       )
