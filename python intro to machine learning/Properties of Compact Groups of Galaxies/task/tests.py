@@ -1,13 +1,5 @@
 from hstest import *
 from math import isclose
-# import re
-
-
-# def is_float(element):
-#     if re.match(r'([+-]?(?:[0-9]*[.])?[0-9]+)', element) is None:
-#         return False
-#     else:
-#         return True
 
 
 def is_float(num: str):
@@ -18,7 +10,7 @@ def is_float(num: str):
         return False
 
 
-class Stage1Test(PlottingTest):
+class Stage3Test(PlottingTest):
     def check_outputs_number(self, values_number: int, user_output: str):
         outputs = user_output.split()
 
@@ -26,7 +18,7 @@ class Stage1Test(PlottingTest):
             raise WrongAnswer(f"Answer '{user_output}' contains non-numeric values.")
 
         if len(outputs) != values_number:
-            raise WrongAnswer(f"Answer contains {len(outputs)} values, but {values_number} values are expexted.")
+            raise WrongAnswer(f"Answer contains {len(outputs)} values, but {values_number} values are expected.")
 
     def check_num_values(self, values: list, user_values: list, message: str, rel_tol=1.0e-3):
         if not all(isclose(value, user_value, rel_tol=rel_tol) for value, user_value in zip(values, user_values)):
@@ -41,25 +33,33 @@ class Stage1Test(PlottingTest):
             raise WrongAnswer("Seems like your program does not show any output.")
 
         # check output format
-        self.check_outputs_number(2, user_output)
+        self.check_outputs_number(3, user_output)
 
-        # check values
-        user_values = [float(value) for value in user_output.split()]
-
-        first_value = [26.678053926691177]
-        self.check_num_values(first_value, user_values[:1],
-                              "The first submitted value (mean of mean surface brightness of the IGL for a groups with features) is wrong.\n"
+        # check fraction of galaxies with n > 2 for CGs galaxies
+        cgs_fraction = [0.6394557823129252]
+        user_values = [float(value) for value in user_output.split()][:1]
+        self.check_num_values(cgs_fraction, user_values,
+                              "The fraction of galaxies with Sersic index n > 2 for groups galaxies is wrong.\n"
                               "Make sure that you provide numbers in the correct order.",
                               rel_tol=1.0e-2)
 
-        first_value = [27.038330296424938]
-        self.check_num_values(first_value, user_values[1:2],
-                              "The second submitted value (mean of mean surface brightness of the IGL for a groups without features) is wrong.\n"
+        # check fraction of galaxies with n > 2 for isolated galaxies
+        p_values = [0.29245283018867924]
+        user_values = [float(value) for value in user_output.split()][1:2]
+        self.check_num_values(p_values, user_values,
+                              "The fraction of galaxies with Sersic index n > 2 for isolated galaxies is wrong.\n"
                               "Make sure that you provide numbers in the correct order.",
                               rel_tol=1.0e-2)
+
+        # check Kolmogorov-Smirnov test p-value
+        p_values = [4.163336342344337e-14]
+        user_values = [float(value) for value in user_output.split()][2:3]
+        self.check_num_values(p_values, user_values, "The p-value of Kolmogorov-Smirnov test is wrong.\n"
+                              "Make sure that you provide numbers in the correct order.",
+                              rel_tol=5.0e-2)
 
         return CheckResult.correct()
 
 
 if __name__ == '__main__':
-    Stage1Test().run_tests()
+    Stage3Test().run_tests()
