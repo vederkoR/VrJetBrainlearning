@@ -9,6 +9,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import Normalizer
 
 
 # # Stage 3
@@ -25,6 +26,9 @@ if __name__ == "__main__":
     x_train = x_train.reshape(len(x_train), -1)
     X_train, X_test, y_train, y_test = train_test_split(x_train[0:6000], y_train[0:6000], train_size=0.7,
                                                         random_state=40)
+    normalizer = Normalizer()
+    x_train_norm = normalizer.transform(X_train)
+    x_test_norm = normalizer.transform(X_test)
     models = (KNeighborsClassifier(),
               DecisionTreeClassifier(random_state=40),
               LogisticRegression(random_state=40, solver="liblinear"),
@@ -32,13 +36,14 @@ if __name__ == "__main__":
     for model in models:
         fit_predict_eval(
             model=model,
-            features_train=X_train,
-            features_test=X_test,
+            features_train=x_train_norm,
+            features_test=x_test_norm,
             target_train=y_train,
             target_test=y_test,
         )
 
-    print(f"The answer to the question: RandomForestClassifier - 0.939")
+    print("The answer to the 1st question: yes")
+    print("The answer to the 2nd question: KNeighborsClassifier-0.953, RandomForestClassifier-0.937")
 
 # # Stage 1
 # classes = np.array(y_train)
