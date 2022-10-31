@@ -51,8 +51,26 @@ class Dominoes:
 if __name__ == "__main__":
     game = Dominoes()
     game.start()
-    print(f"Stock pieces: {[[int(i), int(j)] for (i, j) in game.stock]}")
-    print(f"Computer pieces: {[[int(i), int(j)] for (i, j) in game.player_2.domino_pieces]}")
-    print(f"Player pieces: {[[int(i), int(j)] for (i, j) in game.player_1.domino_pieces]}")
-    print(f"Domino snake: {[[int(i), int(j)] for (i, j) in game.snake]}")
-    print(f"Status: {game.current_player.name}")
+    print('======================================================================')
+    print(f"Stock size: {len(game.stock)}")
+    print(f"Computer pieces: {len(game.player_2.domino_pieces)}")
+    print()
+    print(f'{[[int(i), int(j)] for (i, j) in game.snake][0]}')
+    print()
+    print("Your pieces:")
+    for index, value in enumerate(game.player_1.domino_pieces):
+        print(f"{index + 1}:{[int(value[0]), int(value[1])]}")
+    print()
+    if game.current_player.name == 'computer':
+        print("Status: Computer is about to make a move. Press Enter to continue...")
+    else:
+        print("Status: It's your turn to make a move. Enter your command.")
+
+    # # stage 1
+    # game = Dominoes()
+    # game.start()
+    # print(f"Stock pieces: {[[int(i), int(j)] for (i, j) in game.stock]}")
+    # print(f"Computer pieces: {[[int(i), int(j)] for (i, j) in game.player_2.domino_pieces]}")
+    # print(f"Player pieces: {[[int(i), int(j)] for (i, j) in game.player_1.domino_pieces]}")
+    # print(f"Domino snake: {[[int(i), int(j)] for (i, j) in game.snake]}")
+    # print(f"Status: {game.current_player.name}")
