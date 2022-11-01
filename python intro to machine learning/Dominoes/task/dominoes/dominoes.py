@@ -13,8 +13,8 @@ class Player:
 class Dominoes:
     def __init__(self):
         self.species = list(combinations_with_replacement("0123456", 2))
-        self.player_1 = None
-        self.player_2 = None
+        self.player_1 = None  # real person player
+        self.player_2 = None  # computer player
         self.stock = None
         self.current_player = None
         self.snake = list()
@@ -35,14 +35,17 @@ class Dominoes:
 
     def initiate_current_player(self):
         for i in reversed(range(7)):
+            # logic to find the highest value double_piece
             if (str(i), str(i)) in self.player_1.domino_pieces:
                 self.current_player = self.player_1
                 break
             elif (str(i), str(i)) in self.player_2.domino_pieces:
                 self.current_player = self.player_2
                 break
+        # adds the highest value double_piece to snack
         self.current_player.domino_pieces.remove((str(i), str(i)))
         self.snake.append((str(i), str(i)))
+        # pass the move to second player
         self.change_player()
 
     def start(self):
@@ -76,27 +79,48 @@ class Dominoes:
         print()
 
     def turn(self):
-        if self.current_player == self.player_1:
-            while True:
-                piece_to_take = input()
-                template = r"-?" + "[" + "".join(
-                    [str(i) for i in range(0, len(self.current_player.domino_pieces) + 1)]) + "]"
-                checker = re.fullmatch(template, piece_to_take)
-                if checker:
-                    break
-                else:
-                    print("Invalid input. Please try again.")
+        while True:
+            if self.current_player == self.player_1:
+                # logic for player to select a piece
+                while True:
+                    piece_to_take = input()
+                    template = r"-?" + "[" + "".join(
+                        [str(i) for i in range(0, len(self.current_player.domino_pieces) + 1)]) + "]"
+                    checker = re.fullmatch(template, piece_to_take)
+                    if checker:
+                        break
+                    else:
+                        print("Invalid input. Please try again.")
+                if piece_to_take == '0':
+                    self.player_1.domino_pieces.append(self.stock.pop())
+                    return
+            else:
+                # logic for computer to select a piece
+                pool = [str(i) for i in range(-len(self.current_player.domino_pieces),
+                                              len(self.current_player.domino_pieces) + 1)]
+                shuffle(pool)
+                piece_to_take = pool[0]
             if piece_to_take == '0':
-                self.player_1.domino_pieces.append(self.stock.pop())
+                self.current_player.domino_pieces.append(self.stock.pop())
                 return
-        else:
-            pool = [str(i) for i in range(1, len(self.current_player.domino_pieces) + 1)]
-            shuffle(pool)
-            piece_to_take = pool[0]
-        if piece_to_take.startswith("-"):
-            self.snake.insert(0, self.current_player.domino_pieces.pop(int(piece_to_take[-1]) - 1))
-        else:
-            self.snake.insert(len(self.snake), self.current_player.domino_pieces.pop(int(piece_to_take[-1]) - 1))
+
+            # logic to add to snake
+            sign = "-" if piece_to_take.startswith("-") else "+"
+            piece = self.current_player.domino_pieces.pop(int(piece_to_take[-1]) - 1)
+            check_result = self.move_checker(piece, sign)
+            aligned_piece = piece
+            if check_result == "not allowed":
+                self.current_player.domino_pieces.insert(int(piece_to_take[-1]) - 1, piece) ######## append to correct place!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                if self.current_player == self.player_1:
+                    print("Illegal move. Please try again.")
+                continue
+            elif check_result == "reverse":
+                aligned_piece = tuple(reversed(aligned_piece))
+            if sign == "-":
+                self.snake.insert(0, aligned_piece)
+            else:
+                self.snake.insert(len(self.snake), aligned_piece)
+            break
 
     def status_check(self):
         if not self.player_1.domino_pieces:
@@ -115,6 +139,16 @@ class Dominoes:
             self.current_state = "Status: It's your turn to make a move. Enter your command."
             return False
 
+    def move_checker(self, piece, sign):
+        number_to_compare = self.snake[0][0] if sign == "-" else self.snake[-1][1]
+        if number_to_compare in piece:
+            if (number_to_compare == piece[0] and sign == "+") or (number_to_compare == piece[1] and sign == "-"):
+                return "direct"
+            else:
+                return "reverse"
+        else:
+            return "not allowed"
+
 
 if __name__ == "__main__":
     game = Dominoes()
@@ -131,3 +165,4 @@ if __name__ == "__main__":
             _ = input()
 
         game.change_player()
+
