@@ -1,5 +1,6 @@
 import itertools
 import re
+from collections import Counter
 from itertools import combinations_with_replacement
 from random import shuffle
 
@@ -79,6 +80,8 @@ class Dominoes:
         print()
 
     def turn(self):
+        iteration = 0
+        com_sign = ""
         while True:
             if self.current_player == self.player_1:
                 # logic for player to select a piece
@@ -91,15 +94,10 @@ class Dominoes:
                         break
                     else:
                         print("Invalid input. Please try again.")
-                if piece_to_take == '0':
-                    self.player_1.domino_pieces.append(self.stock.pop())
-                    return
             else:
                 # logic for computer to select a piece
-                pool = [str(i) for i in range(-len(self.current_player.domino_pieces),
-                                              len(self.current_player.domino_pieces) + 1)]
-                shuffle(pool)
-                piece_to_take = pool[0]
+                self.current_player.domino_pieces.sort(key=self.piece_evaluator)
+                piece_to_take = com_sign + str(len(self.current_player.domino_pieces) - iteration)
             if piece_to_take == '0':
                 self.current_player.domino_pieces.append(self.stock.pop())
                 return
@@ -110,9 +108,16 @@ class Dominoes:
             check_result = self.move_checker(piece, sign)
             aligned_piece = piece
             if check_result == "not allowed":
-                self.current_player.domino_pieces.insert(int(piece_to_take[-1]) - 1, piece) ######## append to correct place!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                self.current_player.domino_pieces.insert(int(piece_to_take[-1]) - 1,
+                                                         piece)
                 if self.current_player == self.player_1:
                     print("Illegal move. Please try again.")
+                else:
+                    if com_sign == '':
+                        com_sign = '-'
+                    else:
+                        com_sign = ''
+                        iteration += 1
                 continue
             elif check_result == "reverse":
                 aligned_piece = tuple(reversed(aligned_piece))
@@ -148,6 +153,11 @@ class Dominoes:
                 return "reverse"
         else:
             return "not allowed"
+
+    def piece_evaluator(self, piece):
+        """evaluate the rank of a piece to make a decision for AI"""
+        digit_ranks = Counter(itertools.chain(*self.player_2.domino_pieces, *self.snake))
+        return digit_ranks[piece[0]] + digit_ranks[piece[1]]
 
 
 if __name__ == "__main__":
