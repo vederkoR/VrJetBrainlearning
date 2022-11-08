@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 
 pd.set_option('display.max_columns', 8)
 
@@ -30,17 +31,38 @@ all_hospitals['xray'] = all_hospitals['xray'].fillna(0)
 all_hospitals['children'] = all_hospitals['children'].fillna(0)
 all_hospitals['months'] = all_hospitals['months'].fillna(0)
 
-# print(all_hospitals[all_hospitals.blood_test == "t"].groupby("hospital").count())
+bins = [0, 15, 35, 55, 70, 80]  # ranges
+age_hist = plt.hist(all_hospitals['age'], bins=bins)
+plt.show()
 
-print("The answer to the 1st question is general")  # 👌
-print("The answer to the 2nd question is 0.325") # 👌
-print("The answer to the 3rd question is 0.285") # 👌
-print("The answer to the 4th question is 19") # 👌
-print("The answer to the 5th question is prenatal, 325 blood tests") # 👌
+diagnosis = dict(all_hospitals.groupby("diagnosis").count().hospital)
+labels = diagnosis.keys()
+values = diagnosis.values()
+plt.pie(values, labels=labels, autopct='%.1f%%')
+plt.show()
+
+data_list = [list(all_hospitals[all_hospitals.hospital == 'general']['height']),
+             list(all_hospitals[all_hospitals.hospital == 'sports']['height']),
+             list(all_hospitals[all_hospitals.hospital == 'prenatal']['height'])]
+fig, axes = plt.subplots()
+plt.violinplot(data_list)
+
+plt.show()
+
+print("The answer to the 1st question: 15-35")
+print("The answer to the 2nd question: pregnancy")
+print(
+    "The answer to the 3rd question: It's because some heights are in normal meter system, and some in American foots")
 
 # #step 3
 # print(f"Data shape: {all_hospitals.shape}")
 # print(all_hospitals.sample(n=20, random_state=30))
 
-# # step 4 for calculation
+# # step 4
 # print(all_hospitals[all_hospitals.blood_test == "t"].groupby("hospital").count())
+
+# print("The answer to the 1st question is general")  # 👌
+# print("The answer to the 2nd question is 0.325")  # 👌
+# print("The answer to the 3rd question is 0.285")  # 👌
+# print("The answer to the 4th question is 19")  # 👌
+# print("The answer to the 5th question is prenatal, 325 blood tests")  # 👌
