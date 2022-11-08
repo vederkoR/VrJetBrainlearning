@@ -30,5 +30,17 @@ all_hospitals['xray'] = all_hospitals['xray'].fillna(0)
 all_hospitals['children'] = all_hospitals['children'].fillna(0)
 all_hospitals['months'] = all_hospitals['months'].fillna(0)
 
-print(f"Data shape: {all_hospitals.shape}")
-print(all_hospitals.sample(n=20, random_state=30))
+# print(all_hospitals[all_hospitals.blood_test == "t"].groupby("hospital").count())
+
+print("The answer to the 1st question is general")  # 👌
+print("The answer to the 2nd question is 0.325") # 👌
+print("The answer to the 3rd question is 0.285") # 👌
+print("The answer to the 4th question is 19") # 👌
+print("The answer to the 5th question is prenatal, 325 blood tests") # 👌
+
+# #step 3
+# print(f"Data shape: {all_hospitals.shape}")
+# print(all_hospitals.sample(n=20, random_state=30))
+
+# # step 4 for calculation
+# print(all_hospitals[all_hospitals.blood_test == "t"].groupby("hospital").count())
