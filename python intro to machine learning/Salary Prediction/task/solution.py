@@ -19,10 +19,6 @@ def data_loader():
         r = requests.get(url, allow_redirects=True)
         open('../Data/data.csv', 'wb').write(r.content)
 
-def mape(y_test, pred):
-    y_test, pred = np.array(y_test), np.array(pred)
-    mape = np.mean(np.abs((y_test - pred) / y_test))
-    return mape
 
 def main():
     # read data
@@ -30,15 +26,11 @@ def main():
     data = pd.read_csv('../Data/data.csv')
 
     # write your code here
-    X = np.array([i**3 for i in data.rating]).reshape(-1, 1)
+    X = data.drop(columns=['salary'])
     y = np.array(data.salary)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100)
     lr_model = LinearRegression()
     lr_model.fit(X_train, y_train)
     prediction = lr_model.predict(X_test)
-    mape_final = mape(y_test, prediction)
-    print(round(mape_final, 5))
-
-
-if __name__ == "__main__":
-    main()
+    coefs = ", ".join([str(round(i, 5)) for i in lr_model.coef_])
+    print(coefs)
