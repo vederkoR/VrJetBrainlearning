@@ -30,14 +30,14 @@ def main():
     data = pd.read_csv('../Data/data.csv')
 
     # write your code here
-    X = np.array(data.rating).reshape(-1, 1)
+    X = np.array([i**3 for i in data.rating]).reshape(-1, 1)
     y = np.array(data.salary)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100)
     lr_model = LinearRegression()
     lr_model.fit(X_train, y_train)
     prediction = lr_model.predict(X_test)
     mape_final = mape(y_test, prediction)
-    print(round(lr_model.intercept_, 5), round(lr_model.coef_[0], 5), round(mape_final, 5))
+    print(round(mape_final, 5))
 
 
 if __name__ == "__main__":
