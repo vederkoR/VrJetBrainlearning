@@ -24,25 +24,21 @@ def main():
     # read data
     data_loader()
     data = pd.read_csv('../Data/data.csv')
-    conditions = [[],
-                  ['age'], ['rating'], ['experience'],
-                  ['age', 'rating'], ['age', 'experience'], ['rating', 'experience']
-                  ]
 
-    for i in conditions:
-        X = data.drop(columns=['salary'])
-        X = X.drop(columns=i)
-        correlations = X.corr()
-        correlations.style.background_gradient(cmap='Spectral', axis=None)
-        y = np.array(data.salary)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100)
-        lr_model = LinearRegression()
-        lr_model.fit(X_train, y_train)
-        prediction = lr_model.predict(X_test)
-        coefs = ", ".join([str(round(i, 5)) for i in lr_model.coef_])
-        mape_cur = mape(y_test, prediction)
-        # print(mape_cur, i)
-    print(1.22789)
+    X = data.drop(columns=['salary'])
+    X = X.drop(columns=['age', 'experience'])
+    correlations = X.corr()
+    correlations.style.background_gradient(cmap='Spectral', axis=None)
+    y = np.array(data.salary)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100)
+    lr_model = LinearRegression()
+    lr_model.fit(X_train, y_train)
+    prediction = lr_model.predict(X_test)
+    prediction = [i if i > 0 else 0 for i in prediction]
+    coefs = ", ".join([str(round(i, 5)) for i in lr_model.coef_])
+    mape_cur = mape(y_test, prediction)
+    print(round(mape_cur, 5))
+
 
 if __name__ == "__main__":
     main()
