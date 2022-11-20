@@ -1,12 +1,25 @@
 # Write your code here
 import random
+import sqlite3
+
+conn = sqlite3.connect('card.s3db')
+cur = conn.cursor()
+cur.execute('''CREATE TABLE IF NOT EXISTS card (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    number TEXT,
+    pin TEXT,
+    balance INTEGER DEFAULT 0
+)
+;''')
+conn.commit()
+conn.close()
 
 
 class BankAccount:
-    def __init__(self):
-        self.balance = 0
-        self.card_number = None
-        self.pin = '0000'
+    def __init__(self, card_number=None, pin='0000', balance=0):
+        self.balance = balance
+        self.card_number = card_number
+        self.pin = pin
 
     def generate_nuber(self):
         account_part = str(random.randint(0, 9_999_999_99))
@@ -34,11 +47,36 @@ class BankAccount:
 bank_accounts = dict()
 
 
+def add_to_database(account):
+    conn = sqlite3.connect('card.s3db')
+    cur = conn.cursor()
+    cur.execute(f'''INSERT INTO card (number, pin)
+    VALUES ({account.card_number}, {account.pin})
+    ''')
+    conn.commit()
+    conn.close()
+
+
+def load_databases():
+    conn = sqlite3.connect('card.s3db')
+    cur = conn.cursor()
+    cur.execute(f'''SELECT *
+    FROM card    
+    ''')
+    entry = cur.fetchone()
+    while entry:
+        account_to_load = BankAccount(card_number=entry[1], pin=entry[2], balance=entry[3])
+        bank_accounts[account_to_load.card_number] = account_to_load
+        entry = cur.fetchone()
+    conn.close()
+
+
 def check_input(i):
     return int(i) in range(3)
 
 
 def main():
+    load_databases()
     print(BankAccount.luhn_generate('400000712807361'))
     while True:
         print("1. Create an account\n2. Log into account\n0. Exit")
@@ -50,6 +88,7 @@ def main():
             new_account = BankAccount()
             new_account.generate_nuber()
             new_account.generate_pin()
+            add_to_database(new_account)
             bank_accounts[new_account.card_number] = new_account
             print("\nYour card has been created")
             print(f"Your card number:\n{new_account.card_number}")
@@ -88,3 +127,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
