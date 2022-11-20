@@ -71,17 +71,37 @@ def load_databases():
     conn.close()
 
 
-def check_input(i):
-    return int(i) in range(3)
+def close_account(c_number):
+    conn = sqlite3.connect('card.s3db')
+    cur = conn.cursor()
+    cur.execute(f'''DELETE FROM card
+    WHERE number = {c_number}
+    ''')
+    conn.commit()
+    conn.close()
+
+
+def change_balance(c_number, sum):
+    conn = sqlite3.connect('card.s3db')
+    cur = conn.cursor()
+    cur.execute(f'''UPDATE card
+    SET balance = balance + {sum}
+    WHERE number = {c_number}
+    ''')
+    conn.commit()
+    conn.close()
+
+
+def check_input(i, k):
+    return int(i) in range(k)
 
 
 def main():
     load_databases()
-    print(BankAccount.luhn_generate('400000712807361'))
     while True:
         print("1. Create an account\n2. Log into account\n0. Exit")
         checked = input()
-        if not check_input(checked):
+        if not check_input(checked, 3):
             print("\nThis option doesn't exist\n")
             continue
         if checked == '1':
@@ -106,14 +126,52 @@ def main():
                 else:
                     print("\nYou have successfully logged in!\n")
                     while True:
-                        print("1. Balance\n2. Log out\n0. Exit")
+                        print("1. Balance\n2. Add income\n3. Do transfer\n4. Close account\n5. Log out\n0. Exit")
                         checked_2 = input()
-                        if not check_input(checked_2):
+                        if not check_input(checked_2, 6):
                             print("\nThis option doesn't exist\n")
                             continue
-                        if checked_2 == '1':
-                            print(f'Balance: {account.balance}\n')
+                        elif checked_2 == '1':
+                            print(f'\nBalance: {account.balance}\n')
+
                         elif checked_2 == '2':
+                            print('\nEnter income:')
+                            inc = int(input())
+                            bank_accounts[card_number].balance += inc
+                            change_balance(card_number, inc)
+                            print('Income was added!\n')
+
+
+                        elif checked_2 == '3':
+                            print('\nTransfer')
+                            print('Enter card number:')
+                            card_to_transfer = input()
+                            if card_to_transfer == card_number:
+                                print("You can't transfer money to the same account!\n")
+                                continue
+                            elif card_to_transfer[-1] != BankAccount.luhn_generate(card_to_transfer[0:-1]):
+                                print("Probably you made a mistake in the card number. Please try again!")
+                                continue
+                            elif card_to_transfer not in bank_accounts.keys():
+                                print("Such a card does not exist.")
+                                continue
+                            print("Enter how much money you want to transfer:")
+                            inc = int(input())
+                            if bank_accounts[card_number].balance < int(inc):
+                                print("Not enough money!\n")
+                                continue
+                            bank_accounts[card_number].balance -= inc
+                            change_balance(card_number, -inc)
+                            bank_accounts[card_to_transfer].balance += inc
+                            change_balance(card_to_transfer, inc)
+                            print("Success!\n")
+
+                        elif checked_2 == '4':
+                            del bank_accounts[card_number]
+                            close_account(card_number)
+                            print('\nThe account has been closed!\n')
+                            break
+                        elif checked_2 == '5':
                             break
                         else:
                             print('\nBye!')
@@ -127,4 +185,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
