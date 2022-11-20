@@ -9,12 +9,26 @@ class BankAccount:
         self.pin = '0000'
 
     def generate_nuber(self):
-        account_part = str(random.randint(0, 9_999_999_999))
-        self.card_number = '400000' + (10 - len(account_part)) * '0' + account_part
+        account_part = str(random.randint(0, 9_999_999_99))
+        card_number_wo_last = '400000' + (9 - len(account_part)) * '0' + account_part
+        self.card_number = card_number_wo_last + BankAccount.luhn_generate(card_number_wo_last)
 
     def generate_pin(self):
         gen_pin = str(random.randint(0, 9999))
         self.pin = (4 - len(gen_pin)) * '0' + gen_pin
+
+    @staticmethod
+    def luhn_generate(n):
+        step_1_n = [int(i) for i in n]
+        step_2_n = []
+        for inx, elem in enumerate(step_1_n):
+            if inx % 2 == 1:
+                step_2_n.append(elem)
+            else:
+                step_2_n.append(elem * 2)
+        step_3_n = [i if i < 10 else i - 9 for i in step_2_n]
+        step_4_n = str(1000 - sum(step_3_n))
+        return step_4_n[-1]
 
 
 bank_accounts = dict()
@@ -25,6 +39,7 @@ def check_input(i):
 
 
 def main():
+    print(BankAccount.luhn_generate('400000712807361'))
     while True:
         print("1. Create an account\n2. Log into account\n0. Exit")
         checked = input()
