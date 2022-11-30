@@ -1,4 +1,5 @@
 import sqlite3
+import argparse
 
 
 def first_stage_db_creation(cur):
@@ -164,26 +165,69 @@ def select_to_find_ids(cur):
 
 
 def main():
-    conn = sqlite3.connect("food_blog.db")
+    parser = argparse.ArgumentParser(description="do not use optional parameters if you want to modify the \
+    corresponding database. Otherwise, indicate ingredients as --ingredients=\"milk,sugar,etc\" \
+    and meals as --meals=\"dinner,supper,etc\" to see all receipts meeting the conditions")
+    parser.add_argument('filename')
+    parser.add_argument("--ingredients",
+                        help="specify which ingredients the receipt should contain")
+    parser.add_argument("--meals",
+                        help="specify when the dish should be served")
+
+    args = parser.parse_args()
+
+    conn = sqlite3.connect(args.filename)
     cursor = conn.cursor()
-    # enable foreign keys
-    third_stage_enable_fk(cursor)
-    conn.commit()
 
-    # create all tables
-    first_stage_db_creation(cursor)
-    second_stage_create_receipt_table(cursor)
-    conn.commit()
-    third_stage_create_intermediate_table(cursor)
-    conn.commit()
-    fourth_stage_create_intermediate_table_all(cursor)
-    conn.commit()
+    if not (args.ingredients and args.meals):
 
-    # filling tables
-    first_stage_db_fill_up(cursor)
-    conn.commit()
-    second_and_third_stage_fill_receipt_table(cursor)
-    conn.commit()
+        # enable foreign keys
+        third_stage_enable_fk(cursor)
+        conn.commit()
+
+        # create all tables
+        first_stage_db_creation(cursor)
+        second_stage_create_receipt_table(cursor)
+        conn.commit()
+        third_stage_create_intermediate_table(cursor)
+        conn.commit()
+        fourth_stage_create_intermediate_table_all(cursor)
+        conn.commit()
+
+        # filling tables
+        first_stage_db_fill_up(cursor)
+        conn.commit()
+        second_and_third_stage_fill_receipt_table(cursor)
+        conn.commit()
+
+    else:
+        ings = set(args.ingredients.split(","))
+        meals = args.meals.split(",")
+        if len(meals) == 1:
+            filt = f"m.meal_name = '{meals[0]}'"
+        else:
+            filt = f"m.meal_name IN {tuple(meals)}"
+
+        cursor.execute(f"""
+        SELECT r.recipe_id, r.recipe_name, group_concat(i.ingredient_name)
+        FROM quantity AS q
+        LEFT JOIN serve AS s
+        ON s.recipe_id = q.recipe_id
+        LEFT JOIN meals AS m
+        ON s.meal_id = m.meal_id
+        LEFT JOIN recipes AS r
+        ON r.recipe_id = q.recipe_id
+        LEFT JOIN ingredients AS i
+        ON i.ingredient_id = q.ingredient_id
+        WHERE {filt}
+        GROUP BY r.recipe_id
+        """)
+
+        names = sorted([row[1] for row in cursor.fetchall() if ings.issubset(set(row[2].split(",")))])
+        if not names:
+            print("There are no such recipes in the database.")
+        else:
+            print(f"Recipes selected for you: {', '.join(names)}")
 
     conn.close()
 
