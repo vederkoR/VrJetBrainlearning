@@ -14,6 +14,7 @@ class Flashcard(Base):
     flashcard_id = Column(Integer, primary_key=True)
     question = Column(String(100))
     answer = Column(String(100))
+    box_number = Column(Integer, default=1)
 
 
 def add_manu(selected, session):
@@ -59,6 +60,7 @@ def practice_flashcards(session):
                         break
                     case "y":
                         print(sp.ANSWER, flashcard.answer)
+                        box_placement(flashcard.flashcard_id, session)
                         break
                     case "u":
                         update_flashcard(flashcard.flashcard_id, session)
@@ -67,10 +69,38 @@ def practice_flashcards(session):
                         print(y_n_u_selected, sp.ERROR_REQUEST)
 
 
-def update_flashcard(f_id, session):
+def ident_cur_card(f_id, session):
     query = session.query(Flashcard)
     current_fc_query = query.filter(Flashcard.flashcard_id == f_id)
     current_fc = current_fc_query.first()
+    return current_fc_query, current_fc
+
+
+def box_placement(f_id, session):
+    current_fc_query, current_fc = ident_cur_card(f_id, session)
+    while True:
+        print(sp.LEARNING_MENU)
+        is_correct = input()
+        match is_correct:
+            case 'y':
+                print(current_fc.box_number)
+                if current_fc.box_number == 3:
+                    flashcards.remove(current_fc)
+                    current_fc_query.delete()
+                else:
+                    current_fc_query.update({"box_number": current_fc.box_number + 1})
+                session.commit()
+                break
+            case 'n':
+                current_fc_query.update({"box_number": 1})
+                session.commit()
+                break
+            case _:
+                print(is_correct, sp.ERROR_REQUEST)
+
+
+def update_flashcard(f_id, session):
+    current_fc_query, current_fc = ident_cur_card(f_id, session)
     while True:
         print(sp.UPDATE_MENU)
         option_selected = input()

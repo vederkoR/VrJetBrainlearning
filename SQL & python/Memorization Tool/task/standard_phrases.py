@@ -20,3 +20,6 @@ press "u" to update:\n"""
 FAREWELL_WORDS = "Bye!\n"
 
 ERROR_REQUEST = "is not an option\n"
+
+LEARNING_MENU = """press "y" if your answer is correct:
+press "n" if your answer is wrong:"""
