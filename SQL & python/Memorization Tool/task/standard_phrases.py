@@ -5,12 +5,18 @@ MAIN_MENU = """1. Add flashcards
 ADD_MENY = """\n1. Add a new flashcard
 2. Exit"""
 
+UPDATE_MENU = """press "d" to delete the flashcard:
+press "e" to edit the flashcard:\n"""
+
 NO_FLASHCARDS = "\nThere is no flashcard to practice!\n"
 
 QUESTION = "Question:"
 ANSWER = "Answer:"
 
-REQUEST_TO_SHOW_ANSWER = "Please press \"y\" to see the answer or press \"n\" to skip:\n"
+REQUEST_READ_OR_MODIFY = """press "y" to see the answer:
+press "n" to skip:
+press "u" to update:\n"""
+
 FAREWELL_WORDS = "Bye!\n"
 
 ERROR_REQUEST = "is not an option\n"

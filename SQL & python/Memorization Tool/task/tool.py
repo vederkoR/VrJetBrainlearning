@@ -42,7 +42,7 @@ def add_manu(selected, session):
     return True
 
 
-def practice_flashcards():
+def practice_flashcards(session):
     global flashcards
     if not flashcards:
         print(sp.NO_FLASHCARDS)
@@ -50,15 +50,57 @@ def practice_flashcards():
         for flashcard in flashcards:
             print()
             print(sp.QUESTION, flashcard.question)
-            print(sp.REQUEST_TO_SHOW_ANSWER)
-            y_n_selected = input()
-            match y_n_selected:
-                case "n":
-                    print("")
-                case "y":
-                    print(sp.ANSWER, flashcard.answer)
-                case _:
-                    print(y_n_selected, sp.ERROR_REQUEST)
+            while True:
+                print(sp.REQUEST_READ_OR_MODIFY)
+                y_n_u_selected = input()
+                match y_n_u_selected:
+                    case "n":
+                        print("")
+                        break
+                    case "y":
+                        print(sp.ANSWER, flashcard.answer)
+                        break
+                    case "u":
+                        update_flashcard(flashcard.flashcard_id, session)
+                        break
+                    case _:
+                        print(y_n_u_selected, sp.ERROR_REQUEST)
+
+
+def update_flashcard(f_id, session):
+    query = session.query(Flashcard)
+    current_fc_query = query.filter(Flashcard.flashcard_id == f_id)
+    current_fc = current_fc_query.first()
+    while True:
+        print(sp.UPDATE_MENU)
+        option_selected = input()
+        match option_selected:
+            case 'd':
+                current_fc_query.delete()
+                session.commit()
+                break
+            case 'e':
+                print("current question:", current_fc.question)
+                print("please write a new question:")
+                new_question = input()
+                print()
+
+                print("current answer:", current_fc.answer)
+                print("please write a new answer:")
+                new_answer = input()
+                print()
+
+                if not new_question.strip():
+                    new_question = current_fc.question
+
+                if not new_answer.strip():
+                    new_answer = current_fc.answer
+
+                current_fc_query.update({"question": new_question, "answer": new_answer})
+                session.commit()
+                break
+            case _:
+                print(option_selected, sp.ERROR_REQUEST)
 
 
 def set_database():
@@ -91,7 +133,7 @@ def main():
                     if not again:
                         break
             case "2":
-                practice_flashcards()
+                practice_flashcards(session)
 
             case "3":
                 print(sp.FAREWELL_WORDS)
