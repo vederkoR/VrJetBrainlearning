@@ -1,16 +1,22 @@
-# write your code here
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, Integer, String, create_engine
+
 import standard_phrases as sp
 
+Base = declarative_base()
 flashcards = []
 
 
-class Flashcard:
-    def __init__(self, question, answer):
-        self.question = question
-        self.answer = answer
+class Flashcard(Base):
+    __tablename__ = 'flashcard'
+
+    flashcard_id = Column(Integer, primary_key=True)
+    question = Column(String(100))
+    answer = Column(String(100))
 
 
-def add_manu(selected):
+def add_manu(selected, session):
     global flashcards
     print()
     match selected:
@@ -25,7 +31,10 @@ def add_manu(selected):
                 answer = input()
                 if answer.strip() != '':
                     break
-            flashcards.append(Flashcard(question=question, answer=answer))
+            new_flashcard = Flashcard(question=question, answer=answer)
+            flashcards.append(new_flashcard)
+            session.add(new_flashcard)
+            session.commit()
         case "2":
             return False
         case _:
@@ -52,7 +61,24 @@ def practice_flashcards():
                     print(y_n_selected, sp.ERROR_REQUEST)
 
 
+def set_database():
+    engine = create_engine("sqlite:///flashcard.db?check_same_thread=False")
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
+    return Session()
+
+
+def load_flashcard_list(session):
+    global flashcards
+    db_flashcards_list = session.query(Flashcard).all()
+    if db_flashcards_list:
+        flashcards.extend(session.query(Flashcard).all())
+
+
 def main():
+    session = set_database()
+    load_flashcard_list(session)
+
     while True:
         print(sp.MAIN_MENU)
         selected_main = input()
@@ -61,7 +87,7 @@ def main():
                 while True:
                     print(sp.ADD_MENY)
                     selected_add = input()
-                    again = add_manu(selected_add)
+                    again = add_manu(selected_add, session)
                     if not again:
                         break
             case "2":
