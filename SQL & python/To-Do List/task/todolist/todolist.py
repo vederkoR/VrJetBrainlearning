@@ -5,10 +5,13 @@ from sqlalchemy.orm import sessionmaker, Query
 
 Base = declarative_base()
 all_tasks = []
+
 MAIN_MENU = """1) Today's tasks
 2) Week's tasks
 3) All tasks
-4) Add a task
+4) Missed tasks
+5) Add a task
+6) Delete a task
 0) Exit"""
 
 
@@ -79,6 +82,15 @@ def display_all_tasks():
     print()
 
 
+def del_task(inx, session):
+    task_id = all_tasks[inx].id
+    del all_tasks[inx]
+    query = Query(Task, session)
+    query.filter(Task.id == task_id)
+    query.delete()
+    session.commit()
+
+
 def main():
     session = connect_sql_alchemy()
     load_tasks(session)
@@ -97,7 +109,18 @@ def main():
                 print("All tasks")
                 display_all_tasks()
             case '4':
+                print("Missed tasks:")
+                display_tasks([j for j in all_tasks if j.deadline < datetime.today().date()])
+            case '5':
                 add_task(session)
+            case '6':
+                print("Choose the number of the task you want to delete:")
+                display_all_tasks()
+                inx = int(input()) - 1
+                del_task(inx, session)
+                print("The task has been deleted!")
+                print()
+
             case '0':
                 print("\nBye!")
                 break
