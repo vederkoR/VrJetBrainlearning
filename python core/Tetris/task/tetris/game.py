@@ -38,6 +38,16 @@ class Game:
         return [dot + 10 * times for dot in figure_dots]
 
     def current_position_definer(self):
+        if max(self.current_figure_dots) >= self.dims[0] * (self.dims[1] - 1):
+            return
+        if (self.moves[-1] == 'left' and any([True for i in self.current_figure_dots if
+                                              i in range(0, self.dims[0] * self.dims[1], self.dims[0])])) or (
+                self.moves[-1] == 'right' and any([True for i in self.current_figure_dots if
+                                                   i in range(self.dims[0] - 1, self.dims[0] * self.dims[1],
+                                                              self.dims[0])])):
+            self.moves = self.moves[:-1]
+            self.moves.append('down')
+
         all_moves_dist = Counter(self.moves)
         num_of_rotations = all_moves_dist.get('rotate', 0)
         start_position = self.figure[num_of_rotations % len(self.figure)]
