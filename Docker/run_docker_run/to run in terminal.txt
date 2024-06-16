@@ -1,3 +1,6 @@
 docker build -t "python:3.11-slim" .
 docker build -t hyper-web-app:latest .
 docker run -d -p 8000:8000 -it hyper-web-app
+docker stop <container_id>
+docker rm <container_id>
+docker rmi <image_id>
